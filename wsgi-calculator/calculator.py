@@ -42,16 +42,66 @@ To submit your homework:
 """
 
 
+def info():
+    # add more instructions
+    return "<h1>How To Use</h1>" \
+           "<p>Use one of the following keywords and pass in integers to use this calculator</p>" \
+           "<ul>" \
+           "<li>add</li>" \
+           "<li>subtract</li>"\
+           "<li>multiply</li>"\
+           "<li>divide</li>" \
+           "</ul>" \
+           "<p>Pass the inputs for the operation after the keyword. Refer the following examples.</p>" \
+           "<p>/add/23/42</p>" \
+           "<p>/subtract/23/42</p>" \
+           "<p>/multiply/3/5</p>" \
+           "<p>/divide/22/11</p>"
+
+
 def add(*args):
     """ Returns a STRING with the sum of the arguments """
+    # returns ValueError if not Int
+    args = list(map(int, args))
+    total = args[0]
+    for arg in args[1:]:
+        total += arg
 
-    # TODO: Fill sum with the correct value, based on the
-    # args provided.
-    sum = "0"
+    return str(total)
 
-    return sum
 
-# TODO: Add functions for handling more arithmetic operations.
+def subtract(*args):
+    """ Returns a STRING with the sum of the arguments """
+    # returns ValueError if not Int
+    args = list(map(int, args))
+    total = args[0]
+    for arg in args[1:]:
+        total -= arg
+
+    return str(total)
+
+
+def multiply(*args):
+    """ Returns a STRING with the sum of the arguments """
+    # returns ValueError if not Int
+    args = list(map(int, args))
+    total = args[0]
+    for arg in args[1:]:
+        total *= arg
+
+    return str(total)
+
+
+def divide(*args):
+    """ Returns a STRING with the sum of the arguments """
+    # returns ValueError if not Int
+    args = list(map(int, args))
+    total = args[0]
+    for arg in args[1:]:
+        total /= arg
+
+    return str(total)
+
 
 def resolve_path(path):
     """
@@ -59,26 +109,55 @@ def resolve_path(path):
     arguments.
     """
 
-    # TODO: Provide correct values for func and args. The
-    # examples provide the correct *syntax*, but you should
-    # determine the actual values of func and args using the
-    # path.
-    func = add
-    args = ['25', '32']
+    functions = {
+        '': info,
+        'add': add,
+        'subtract': subtract,
+        'multiply': multiply,
+        'divide': divide
+    }
+    path = path.strip('/').split('/')
+    try:
+        function = functions[path[0]]
+        arguments = path[1:]
+        return function, arguments
+    except IndexError:
+        raise NameError
+    except KeyError:
+        raise NameError
 
-    return func, args
 
 def application(environ, start_response):
-    # TODO: Your application code from the book database
-    # work here as well! Remember that your application must
-    # invoke start_response(status, headers) and also return
-    # the body of the response in BYTE encoding.
-    #
-    # TODO (bonus): Add error handling for a user attempting
-    # to divide by zero.
-    pass
+    headers = [('Content-Type', 'text/html')]
+    path = environ.get('PATH_INFO', None)
+    try:
+        if not path:
+            raise NameError
+        function, args = resolve_path(path)
+        body = function(*args)
+        status = "200 OK"
+    except NameError:
+        status = "404 Not Found"
+        body = "<h1>Not Found</h1>"
+    except ZeroDivisionError:
+        status = "400 Bad Request"
+        body = "<h1>Bad Request</h1>" \
+               "<h2>Cannot Divide By Zero</h2>"
+    except ValueError:
+        status = "400 Bad Request"
+        body = "<h1>Bad Request</h1>" \
+               "<h2>Arguments Must Be Integers</h2>"
+    except Exception as exception:
+        status = "500 Internal Server Error"
+        body = "<h1> Internal Server Error</h1>"
+        print(str(exception))
+    finally:
+        headers.append(('Content-Length', str(len(body))))
+        start_response(status, headers)
+        return [body.encode('utf8')]
+
 
 if __name__ == '__main__':
-    # TODO: Insert the same boilerplate wsgiref simple
-    # server creation that you used in the book database.
-    pass
+    from wsgiref.simple_server import make_server
+    srv = make_server('localhost', 8080, application)
+    srv.serve_forever()
