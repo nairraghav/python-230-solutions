@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>{{ post.title }}</h1>
+<h2>Author: {{ post.author }}</h2>
+<div class="post-body">
+    {{ post.text }}
+</div>
+<div class="dates">
+    <div class="created-date">
+        Created: {{ post.created_date }}
+    </div>
+    {% if post.modified_date != post.created_date %}
+        <div class="modified-date">
+            Modified: {{ post.modified_date }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
