@@ -14,6 +14,9 @@ class Post(models.Model):
     modified_date = models.DateTimeField(auto_now=True)
     published_date = models.DateTimeField(blank=True, null=True)
 
+    def __str__(self):
+        return self.title
+
     @property
     def is_modified_date_significant(self):
         """This function will return a boolean depending on whether or not the
