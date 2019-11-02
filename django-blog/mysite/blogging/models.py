@@ -13,3 +13,10 @@ class Post(models.Model):
     # auto_now sets the DateTime whenever the Post is saved
     modified_date = models.DateTimeField(auto_now=True)
     published_date = models.DateTimeField(blank=True, null=True)
+
+    @property
+    def is_modified_date_significant(self):
+        """This function will return a boolean depending on whether or not the
+        modified_date is worth showing. This is used to show the modified_date
+        if it is atleast one minute more than the created date"""
+        return (self.modified_date - self.created_date).seconds > 60

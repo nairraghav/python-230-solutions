@@ -10,7 +10,7 @@
     <div class="created-date">
         Created: {{ post.created_date }}
     </div>
-    {% if post.modified_date != post.created_date %}
+    {% if post.is_modified_date_significant %}
         <div class="modified-date">
             Modified: {{ post.modified_date }}
         </div>
