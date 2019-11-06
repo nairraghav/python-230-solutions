@@ -1,19 +1,23 @@
 from django.shortcuts import render
-from django.http import Http404
+from django.http import HttpResponse, Http404
 from blogging.models import Post
+from django.template import loader
 
 
 def list_view(request):
-    context = {'posts': Post.objects.all()}
-    return render(request, 'blogging/list.html', context)
+    published = Post.objects.exclude(published_date__exact=None)
+    posts = published.order_by('-published_date')
+    template = loader.get_template('blogging/list.html')
+    context = {'posts': posts}
+    body = template.render(context)
+    return HttpResponse(body, content_type="text/html")
 
 
-def details_view(request, poll_id):
+def details_view(request, post_id):
+    published = Post.objects.exclude(published_date__exact=None)
     try:
-        post = Post.objects.get(pk=poll_id)
+        post = published.get(pk=post_id)
     except Post.DoesNotExist:
         raise Http404
-
-    # we want to return this view in both POST and GET
     context = {'post': post}
     return render(request, 'blogging/details.html', context)

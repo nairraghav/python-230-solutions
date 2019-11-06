@@ -1,19 +1,17 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h1>{{ post.title }}</h1>
-<h2>Author: {{ post.author }}</h2>
-<div class="post-body">
-    {{ post.text }}
-</div>
-<div class="dates">
-    <div class="created-date">
-        Created: {{ post.created_date }}
+    <a class="backlink" href="/">Home</a>
+    <h1>{{ post }}</h1>
+    <p class="byline">
+        Posted by {{ post.author.username }} &mdash; {{ post.published_date }}
+    </p>
+    <div class="post-body">
+        {{ post.text }}
     </div>
-    {% if post.is_modified_date_significant %}
-        <div class="modified-date">
-            Modified: {{ post.modified_date }}
-        </div>
-    {% endif %}
-</div>
+    <ul class="categories">
+        {% for category in post.categories.all %}
+        <li>{{ category }}</li>
+        {% endfor %}
+    </ul>
 {% endblock %}

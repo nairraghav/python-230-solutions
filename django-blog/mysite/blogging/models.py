@@ -23,3 +23,15 @@ class Post(models.Model):
         modified_date is worth showing. This is used to show the modified_date
         if it is atleast one minute more than the created date"""
         return (self.modified_date - self.created_date).seconds > 60
+
+
+class Category(models.Model):
+    name = models.CharField(max_length=128, unique=True)
+    description = models.TextField(blank=True)
+    posts = models.ManyToManyField(Post, blank=True, related_name='categories')
+
+    class Meta:
+        verbose_name_plural = 'Categories'
+
+    def __str__(self):
+        return self.name
